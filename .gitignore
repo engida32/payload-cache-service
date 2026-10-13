@@ -1,0 +1,50 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# --- Tooling caches ---
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Local database files ---
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*~
+
+# --- Planning / internal artefacts (not part of the submission) ---
+docs/superpowers/
+plans/
+*.plan.md
+
+# --- Assessment prompt (keep the public repo neutral) ---
+Test task Python.md
