@@ -8,7 +8,16 @@ from payload_cache.cli.main import CliSettings
 def test_parses_all_flags():
     settings = CliApp.run(
         CliSettings,
-        cli_args=["--host", "http://x:9", "--repeat", "3", "--json", '{"list_1":["a"],"list_2":["b"]}', "--output", "-"],
+        cli_args=[
+            "--host",
+            "http://x:9",
+            "--repeat",
+            "3",
+            "--json",
+            '{"list_1":["a"],"list_2":["b"]}',
+            "--output",
+            "-",
+        ],
     )
     assert settings.host == "http://x:9"
     assert settings.repeat == 3
