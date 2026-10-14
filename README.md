@@ -326,12 +326,12 @@ uv run pytest -m integration
 uv run pytest --cov=payload_cache --cov-report=term-missing
 ```
 
-The suite has **37 tests** and covers canonicalization/hashing determinism and
+The suite has **39 tests** and covers canonicalization/hashing determinism and
 version sensitivity, interleaving (including empty lists), the transformer,
 the transform-cache repository, payload-service idempotency and the cache-reuse
-proof, settings validation, and the CLI. Tests marked `integration` include a
-true end-to-end CLI test that starts a `uvicorn` instance on a free port; pytest
-collects them by default.
+proof, settings/CLI-flag validation (including the short flags), and the CLI.
+Tests marked `integration` include a true end-to-end CLI test that starts a
+`uvicorn` instance on a free port; pytest collects them by default.
 
 Lint and type checks:
 
