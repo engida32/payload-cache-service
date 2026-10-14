@@ -22,7 +22,12 @@ from payload_cache.api.schemas import PayloadRequest
 
 class CliSettings(BaseSettings):
     model_config = SettingsConfigDict(
-        cli_shortcuts={"json_input": "json"},
+        cli_shortcuts={
+            "repeat": "r",
+            "input": "i",
+            "json_input": ["json", "j"],
+            "output": "o",
+        },
         cli_exit_on_error=True,
     )
 

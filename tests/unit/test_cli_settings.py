@@ -30,6 +30,22 @@ def test_json_shortcut():
     assert settings.json_input == '{"list_1":[],"list_2":[]}'
 
 
+def test_parses_short_flags():
+    settings = CliApp.run(
+        CliSettings,
+        cli_args=["-r", "3", "-j", '{"list_1":["a"],"list_2":["b"]}', "-o", "-"],
+    )
+    assert settings.repeat == 3
+    assert settings.json_input == '{"list_1":["a"],"list_2":["b"]}'
+    assert settings.output == "-"
+
+
+def test_short_input_and_output():
+    settings = CliApp.run(CliSettings, cli_args=["-i", "in.json", "-o", "out.txt"])
+    assert settings.input == "in.json"
+    assert settings.output == "out.txt"
+
+
 def test_requires_exactly_one_source():
     with pytest.raises(ValidationError):
         CliApp.run(CliSettings, cli_args=[])

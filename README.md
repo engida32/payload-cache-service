@@ -126,26 +126,28 @@ usage: cache-cli [-h] [--host str] [--repeat int] [--input {str,null}]
 options:
   -h, --help            show this help message and exit
   --host str            (default: http://localhost:8000)
-  --repeat int          (default: 1)
-  --input {str,null}    (default: null)
-  --json_input {str,null}, --json {str,null}
+  --repeat int, -r int  (default: 1)
+  --input {str,null}, -i {str,null}
                         (default: null)
-  --output str          (default: -)
+  --json_input {str,null}, --json {str,null}, -j {str,null}
+                        (default: null)
+  --output str, -o str  (default: -)
 ```
 
 | Flag | Default | Notes |
 |---|---|---|
 | `--host URL` | `http://localhost:8000` | Base URL of the server. |
-| `--repeat N` | `1` | Number of POST+GET iterations; must be `>= 1`. |
-| `--input FILE\|-` | — | Read the JSON request from a file; `-` means stdin. |
-| `--json JSON` | — | Inline JSON request (properly shell-escaped). |
-| `--output FILE\|-` | `-` | Write the output to a file; `-` means stdout. |
+| `-r`, `--repeat N` | `1` | Number of POST+GET iterations; must be `>= 1`. |
+| `-i`, `--input FILE\|-` | — | Read the JSON request from a file; `-` means stdin. |
+| `-j`, `--json JSON` | — | Inline JSON request (properly shell-escaped). `--json` is an alias of `--json_input`. |
+| `-o`, `--output FILE\|-` | `-` | Write the output to a file; `-` means stdout. |
 | `-h`, `--help` | — | Print help and exit. |
 
 - **`-h` means help, not host.** The task synopsis showed `-h` for both; the host
-  flag deliberately has **no** short form so `-h/--help` stays help.
+  flag deliberately has **no** short form so `-h/--help` stays help. All the other
+  documented short flags (`-r/-i/-j/-o`) are present; only `--host` lacks one.
 - The model field is named `json_input` (a field literally named `json` would
-  shadow a `BaseModel` method); `cli_shortcuts` exposes it as `--json`.
+  shadow a `BaseModel` method); `cli_shortcuts` exposes it as `--json` (and `-j`).
 - Exactly one of `--json` / `--input` is required.
 
 **Output contract.** stdout carries *only* the payload output (one line per
