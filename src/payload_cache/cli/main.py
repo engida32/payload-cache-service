@@ -2,7 +2,8 @@
 
 Parsing/sanitizing uses Pydantic Settings (per the task). The field is
 `json_input` (a field literally named `json` would shadow a BaseModel method)
-and `cli_shortcuts` exposes it as `--json`.
+and `cli_shortcuts` exposes it as `--json`/`-j` and adds the `-r`, `-i` and
+`-o` short forms (see `--help`).
 
 stdout carries only the payload output (pipe-friendly); the id, cache status and
 timing go to stderr. Exit codes: 0 ok, 1 runtime/connection, 2 argument error.
