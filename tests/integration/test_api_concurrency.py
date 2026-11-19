@@ -35,9 +35,7 @@ def test_simultaneous_requests_share_one_build(engine):
 
     with TestClient(app) as client:
         with ThreadPoolExecutor(max_workers=8) as pool:
-            responses = list(
-                pool.map(lambda _: client.post("/payload", json=SAMPLE), range(8))
-            )
+            responses = list(pool.map(lambda _: client.post("/payload", json=SAMPLE), range(8)))
 
     bodies = [response.json() for response in responses]
     assert {body["id"] for body in bodies} == {bodies[0]["id"]}

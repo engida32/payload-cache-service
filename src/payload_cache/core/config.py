@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./payload_cache.db"
     transformer_latency_ms: int = 50
     cache_version: int = 1
+    cache_ttl_seconds: int = 0
 
 
 @lru_cache
