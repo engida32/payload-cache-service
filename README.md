@@ -1,5 +1,7 @@
 # Payload Cache Service
 
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+
 A FastAPI caching microservice that generates payloads from two equal-length
 lists of strings, plus a `cache-cli` tool for exercising it over HTTP.
 
