@@ -13,6 +13,22 @@ payloads, so repeated or partially overlapping requests skip the transformer
 entirely. The transformer is injected through FastAPI dependencies, which is
 what makes the cache behaviour testable without a network or a database.
 
+## What the cache saves
+
+Three requests: the same 3+3 lists twice, then a request that adds two strings
+to each list. The transformer sleeps 25 ms per string. Real output of
+`uv run python scripts/bench.py`:
+
+```text
+transformer latency: 25 ms per string
+1 miss (3+3)             209.6 ms  cached=false transformer calls=6
+2 repeat (3+3)             4.7 ms  cached=true  transformer calls=0
+3 partial (5+5)          139.7 ms  cached=false transformer calls=4
+```
+
+The repeat skips the transformer completely. The partial request pays only for
+the four strings it has not seen and reuses the six it has.
+
 **Input:**
 
 ```json
