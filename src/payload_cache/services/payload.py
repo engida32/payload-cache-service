@@ -1,7 +1,9 @@
 """Level-1 cache and orchestration: idempotent payload creation.
 
 Order matters — the transformer (a slow external call) runs *outside* the DB
-write, so no lock is held across the network hop.
+write, so no lock is held across the network hop. Concurrent requests for the
+same payload are collapsed into one build by a single-flight gate keyed on the
+payload id.
 """
 
 from sqlalchemy.exc import IntegrityError
@@ -10,7 +12,10 @@ from sqlmodel import Session
 from payload_cache.core.hashing import canonical_payload, payload_id
 from payload_cache.db.models import Payload
 from payload_cache.services.cache import TransformCacheRepository
+from payload_cache.services.singleflight import SingleFlight
 from payload_cache.services.transformer import Transformer
+
+_flights = SingleFlight()
 
 
 class PayloadCollisionError(RuntimeError):
@@ -37,6 +42,28 @@ class PayloadService:
                 raise PayloadCollisionError(pid)
             return existing.id, True
 
+        stored, leader = _flights.run(
+            pid, lambda: self._store(pid, canonical, list_1, list_2, transformer)
+        )
+        if not leader:
+            # This session read the table before the leader committed.
+            self.session.rollback()
+        return pid, not (stored and leader)
+
+    def _store(
+        self,
+        pid: str,
+        canonical: str,
+        list_1: list[str],
+        list_2: list[str],
+        transformer: Transformer,
+    ) -> bool:
+        existing = self.session.get(Payload, pid)
+        if existing is not None:
+            if existing.input_json != canonical:
+                raise PayloadCollisionError(pid)
+            return True
+
         output = self._build(list_1, list_2, transformer)
 
         row = Payload(id=pid, input_json=canonical, output=output)
@@ -47,8 +74,8 @@ class PayloadService:
         except IntegrityError:
             # A concurrent request created the same payload first.
             self.session.rollback()
-            return pid, True
-        return pid, False
+            return False
+        return True
 
     def get(self, pid: str) -> str | None:
         row = self.session.get(Payload, pid)

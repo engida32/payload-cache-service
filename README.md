@@ -29,6 +29,11 @@ transformer latency: 25 ms per string
 The repeat skips the transformer completely. The partial request pays only for
 the four strings it has not seen and reuses the six it has.
 
+Simultaneous copies of one request do not each build it. A single-flight gate
+keyed on the payload id lets one caller transform and parks the rest on its
+result, so eight concurrent identical posts still make six transformer calls; a
+test in `tests/integration/test_api_concurrency.py` asserts exactly that.
+
 **Input:**
 
 ```json
