@@ -23,9 +23,10 @@ class PayloadCollisionError(RuntimeError):
 
 
 class PayloadService:
-    def __init__(self, session: Session, version: int) -> None:
+    def __init__(self, session: Session, version: int, ttl_seconds: int = 0) -> None:
         self.session = session
         self.version = version
+        self.ttl_seconds = ttl_seconds
 
     def create(
         self, list_1: list[str], list_2: list[str], transformer: Transformer
@@ -82,7 +83,7 @@ class PayloadService:
         return row.output if row is not None else None
 
     def _build(self, list_1: list[str], list_2: list[str], transformer: Transformer) -> str:
-        cache = TransformCacheRepository(self.session, self.version)
+        cache = TransformCacheRepository(self.session, self.version, self.ttl_seconds)
         distinct = list(dict.fromkeys([*list_1, *list_2]))
         cached = cache.get_many(distinct)
         missing = [value for value in distinct if value not in cached]

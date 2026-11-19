@@ -76,7 +76,7 @@ src/payload_cache/
     schemas.py          # Pydantic request/response models
     deps.py             # DI: session, transformer
   core/
-    config.py           # BaseSettings: DATABASE_URL, TRANSFORMER_LATENCY_MS, CACHE_VERSION
+    config.py           # BaseSettings: DATABASE_URL, TRANSFORMER_LATENCY_MS, CACHE_VERSION, CACHE_TTL_SECONDS
     hashing.py          # canonical JSON -> payload id
   services/
     payload.py          # PayloadService: dedupe, memoize, interleave, persist
@@ -243,10 +243,10 @@ the new rows are committed, and only then is the payload row written.
 - **No Unicode NFC normalization.** Cache keys are the exact raw strings, so
   composed (`café`) and decomposed (`cafe\u0301`) forms hash and cache
   differently. This is a deliberate simplification.
-- **Rare duplicate transformer call.** Two concurrent *first* requests for the
-  same new input may each call the transformer for the same misses. Correctness
-  is preserved by the savepoint-guarded inserts; eliminating the duplicate call
-  would require a distributed lock, which is out of scope.
+- **Single-flight is per process.** Concurrent identical requests inside one
+  process share a build; two processes still race, and correctness there rests
+  on the savepoint-guarded inserts. A shared lock would need Redis or a database
+  advisory lock, which is out of scope.
 - **Schema creation.** Tables are created on startup with `create_all`; Alembic
   is the intended production migration path but is not included.
 - No authentication, authorization, or rate limiting (non-goals).
@@ -286,6 +286,7 @@ Configuration is read from the environment (and an optional `.env` file):
 | `DATABASE_URL` | `sqlite:///./payload_cache.db` | SQLAlchemy URL. SQLite is the default; PostgreSQL is selected with a `postgresql+psycopg://` URL. |
 | `TRANSFORMER_LATENCY_MS` | `50` | Simulated per-string latency of the transformer. |
 | `CACHE_VERSION` | `1` | Folded into the payload id and the transform-cache key. |
+| `CACHE_TTL_SECONDS` | `0` | Level-2 entry lifetime. `0` keeps entries until they are rewritten; a positive value makes older rows invisible and lets the next request refresh them. |
 
 Interactive API docs are available at `http://localhost:8000/docs` while the
 server runs.

@@ -29,7 +29,9 @@ def create_payload(
     transformer: Transformer = Depends(get_transformer),  # noqa: B008
     settings: Settings = Depends(get_settings),  # noqa: B008
 ) -> PayloadCreatedResponse:
-    service = PayloadService(session, version=settings.cache_version)
+    service = PayloadService(
+        session, version=settings.cache_version, ttl_seconds=settings.cache_ttl_seconds
+    )
     pid, cached = service.create(payload.list_1, payload.list_2, transformer)
     return PayloadCreatedResponse(id=pid, cached=cached)
 
@@ -40,7 +42,9 @@ def read_payload(
     session: Session = Depends(get_session),  # noqa: B008
     settings: Settings = Depends(get_settings),  # noqa: B008
 ) -> PayloadResponse:
-    service = PayloadService(session, version=settings.cache_version)
+    service = PayloadService(
+        session, version=settings.cache_version, ttl_seconds=settings.cache_ttl_seconds
+    )
     output = service.get(payload_id)
     if output is None:
         raise HTTPException(status_code=404, detail="payload not found")
