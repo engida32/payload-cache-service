@@ -1,16 +1,17 @@
 # Payload Cache Service
 
+[![CI](https://github.com/engida32/payload-cache-service/actions/workflows/ci.yml/badge.svg)](https://github.com/engida32/payload-cache-service/actions/workflows/ci.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-A FastAPI caching microservice that generates payloads from two equal-length
-lists of strings, plus a `cache-cli` tool for exercising it over HTTP.
+A FastAPI service that builds payloads from two equal-length lists of strings,
+with a `cache-cli` client for calling it over HTTP.
 
 Generation is the positional **interleave** of the two lists after each string
-is passed through a "transformer function" — a stand-in for a slow external
-service that, here, uppercases its input. The point of the exercise is
-**two-level caching**: the service must reuse both the transformed strings and
-the identifiers of previously generated payloads, so the number of transformer
-calls is minimized.
+is passed through a transformer. The service implements **two-level caching**:
+it stores the transformed strings and the identifiers of previously generated
+payloads, so repeated or partially overlapping requests skip the transformer
+entirely. The transformer is injected through FastAPI dependencies, which is
+what makes the cache behaviour testable without a network or a database.
 
 **Input:**
 
